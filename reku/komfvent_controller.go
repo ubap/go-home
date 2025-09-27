@@ -162,6 +162,8 @@ func makeCharsetReader(charset string, input io.Reader) (io.Reader, error) {
 func komfventDataToStatus(komfventData KomfventData) Status {
 	status := Status{}
 	status.ExtractAirTemperature = string(komfventData.ExtractAirTemperature)
+	status.OutdoorAirTemperature = string(komfventData.OutdoorAirTemperature)
+	status.SupplyAirTemperature = string(komfventData.SupplyAirTemperature)
 	return status
 }
 

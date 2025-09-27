@@ -21,9 +21,9 @@ func NewMockRecuperator() *MockRecuperator {
 		currentStatus: Status{
 			Power:                 45,
 			Recovery:              88,
-			ExtractAirTemperature: "21.5",
-			TempInlet:             19.8,
-			TempOutside:           12.0,
+			ExtractAirTemperature: "21.5 °C",
+			SupplyAirTemperature:  "19.8 °C",
+			OutdoorAirTemperature: "12.0 °C",
 		},
 	}
 }
