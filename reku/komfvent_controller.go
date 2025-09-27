@@ -7,7 +7,6 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"os"
 	"strings"
 
 	"golang.org/x/text/encoding/charmap"
@@ -63,22 +62,7 @@ type KomfventData struct {
 }
 
 func NewKomfventRecuperator() *KomfventRecuperator {
-	// 1. Odczytaj zmienną środowiskową o nazwie RECUPERATOR_ADDRESS
-	//    Nazwa zmiennej jest dowolna, ale dobrze, by była opisowa.
-	address := os.Getenv("RECUPERATOR_ADDRESS")
-
-	// 2. Sprawdź, czy zmienna została ustawiona.
-	//    Jeśli os.Getenv() nie znajdzie zmiennej, zwróci pusty string "".
-	if address == "" {
-		// 3. Jeśli zmienna jest pusta, użyj wartości domyślnej.
-		address = "http://192.168.1.24"
-		fmt.Println("Zmienna środowiskowa RECUPERATOR_ADDRESS nie jest ustawiona. Używam domyślnego adresu:", address)
-	} else {
-		fmt.Println("Znaleziono zmienną środowiskową RECUPERATOR_ADDRESS. Używam adresu:", address)
-	}
-
-	// Zwróć strukturę z adresem (ze zmiennej środowiskowej lub domyślnym)
-	return &KomfventRecuperator{address: address, username: "user", password: "user"}
+	return &KomfventRecuperator{address: "http://192.168.1.24", username: "user", password: "user"}
 }
 
 func (k *KomfventRecuperator) GetStatus() (Status, error) {
