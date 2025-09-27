@@ -1,0 +1,25 @@
+package reku
+
+// Status reprezentuje aktualny stan rekuperatora.
+// Użyjemy tej struktury do przesyłania danych wewnątrz programu.
+type Status struct {
+	Power       int     `json:"moc"`
+	Recovery    int     `json:"odzysk"`
+	TempExtract float32 `json:"temp_wyciagu"`
+	TempInlet   float32 `json:"temp_nawiewu"`
+	TempOutside float32 `json:"temp_zewnatrz"`
+}
+
+// RecuperatorController to nasz interfejs.
+// Definiuje on zestaw metod, które każda implementacja (prawdziwa, mockowa) musi posiadać.
+type RecuperatorController interface {
+	// GetStatus pobiera aktualny stan rekuperatora.
+	GetStatus() (Status, error)
+
+	// SetPower ustawia moc wentylatorów.
+	SetPower(power int) error
+
+	// SetMode ustawia tryb pracy (np. chłodzenie/grzanie).
+	// Dodajemy go dla przykładu, aby interfejs był bardziej kompletny.
+	SetMode(mode string) error
+}
