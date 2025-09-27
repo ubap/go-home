@@ -1,10 +1,10 @@
 package main
 
 import (
-	"awesomeProject/reku"
 	"encoding/json"
 	"flag" // Użyjemy flag do przełączania trybu mock/real
 	"fmt"
+	"goHome/reku"
 	"log"
 	"net/http"
 )

@@ -1,4 +1,4 @@
-module awesomeProject
+module goHome
 
 go 1.24.0
 
