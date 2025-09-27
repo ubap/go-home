@@ -21,8 +21,28 @@ jobs:
       with:
         go-version: '1.24'
 
-    - name: Build
-      run: make build
+    - name: Start Mock Server
+      run: |
+        echo "Starting mock server in the background..."
+        go run ./mocks/ &
+        
+        for i in {1..60}; do
+          # curl -s: tryb cichy (bez paska postępu)
+          # -o /dev/null: odrzucenie treści odpowiedzi (nie chcemy jej wyświetlać)
+          # -w "%{http_code}": wypisanie na wyjście tylko kodu statusu
+          if [ "$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8000)" -eq "200" ]; then
+            echo "Server is ready!"
+            exit 0 # Zakończ ten krok sukcesem
+          fi
+          sleep 1
+        done
+      
+        echo "Error: Server did not start in given wait time"
+        exit 1 # Zakończ ten krok niepowodzeniem
 
-    - name: Test
-      run: make test
+    - name: Run Go Tests
+      # Używamy klauzuli 'env', aby ustawić zmienną środowiskową
+      # tylko dla tego jednego kroku. Jest to czytelniejsze niż pisanie jej w linii poleceń.
+      env:
+        RECUPERATOR_ADDRESS: "http://localhost:8000"
+      run: go test ./... -v
