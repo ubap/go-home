@@ -30,7 +30,7 @@ jobs:
           # curl -s: tryb cichy (bez paska postępu)
           # -o /dev/null: odrzucenie treści odpowiedzi (nie chcemy jej wyświetlać)
           # -w "%{http_code}": wypisanie na wyjście tylko kodu statusu
-          if [ "$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8000)" -eq "200" ]; then
+          if [ "$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080)" -eq "200" ]; then
             echo "Server is ready!"
             exit 0 # Zakończ ten krok sukcesem
           fi
@@ -44,5 +44,5 @@ jobs:
       # Używamy klauzuli 'env', aby ustawić zmienną środowiskową
       # tylko dla tego jednego kroku. Jest to czytelniejsze niż pisanie jej w linii poleceń.
       env:
-        RECUPERATOR_ADDRESS: "http://localhost:8000"
+        RECUPERATOR_ADDRESS: "http://localhost:8080"
       run: go test ./... -v

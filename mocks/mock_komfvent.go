@@ -7,6 +7,7 @@ import (
 )
 
 func main() {
+	port := "8080"
 	// Definiujemy handler (funkcję obsługującą zapytania)
 	http.HandleFunc("/i.asp", func(w http.ResponseWriter, r *http.Request) {
 		// Jest to wygodniejsze dla czytelności XMLa
@@ -35,9 +36,8 @@ func main() {
 	})
 
 	// Informacja o starcie serwera
-	fmt.Println("Serwer HTTP działa na porcie 8000...")
+	fmt.Println("Serwer HTTP działa na porcie " + port)
 
-	// Uruchamiamy serwer. Funkcja nasłuchuje na porcie 8000.
 	// log.Fatal opakowuje wywołanie, aby złapać i wyświetlić ewentualne błędy przy starcie.
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
