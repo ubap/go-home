@@ -18,7 +18,7 @@ type APIServer struct {
 
 func main() {
 	// Definiujemy flagę startową, aby móc wybrać implementację
-	useMock := flag.Bool("mock", true, "Użyj mockowego kontrolera zamiast prawdziwego")
+	useMock := flag.Bool("mock", false, "Użyj mockowego kontrolera zamiast prawdziwego")
 	flag.Parse() // Parsujemy flagi podane przy uruchomieniu
 
 	// Tworzymy zmienną typu naszego interfejsu
@@ -28,8 +28,7 @@ func main() {
 	if *useMock {
 		ctrl = reku.NewMockRecuperator()
 	} else {
-		// Tutaj podaj dane swojego portu szeregowego
-		// ctrl = NewSerialRecuperator("/dev/ttyUSB0", 9600)
+		ctrl = reku.NewKomfventRecuperator()
 	}
 
 	// Inicjalizujemy system autoryzacji

@@ -19,11 +19,11 @@ func NewMockRecuperator() *MockRecuperator {
 	log.Println("Używam mockowego kontrolera rekuperatora.")
 	return &MockRecuperator{
 		currentStatus: Status{
-			Power:       45,
-			Recovery:    88,
-			TempExtract: 21.5,
-			TempInlet:   19.8,
-			TempOutside: 12.0,
+			Power:                 45,
+			Recovery:              88,
+			ExtractAirTemperature: "21.5",
+			TempInlet:             19.8,
+			TempOutside:           12.0,
 		},
 	}
 }

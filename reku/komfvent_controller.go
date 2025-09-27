@@ -27,16 +27,16 @@ type KomfventData struct {
 	XMLName xml.Name `xml:"A"`
 
 	// Tag `xml:"OMO"` mapuje element <OMO> na pole Mode w strukturze.
-	Mode                  TrimmedString `xml:"MODE"`
+	Mode                  TrimmedString `xml:"OMO"`
 	SupplyAirTemperature  TrimmedString `xml:"AI0"`
 	ExtractAirTemperature TrimmedString `xml:"AI1"`
 	OutdoorAirTemperature TrimmedString `xml:"AI2"`
-	SupplyFanSpeed        TrimmedString `xml:"SP"`
-	ExtractFanSpeed       TrimmedString `xml:"SAF"`
-	Eaf                   TrimmedString `xml:"EAF"`
-	Safs                  TrimmedString `xml:"SAFS"`
-	Eafs                  TrimmedString `xml:"EAFS"`
-	Fcg                   TrimmedString `xml:"FCG"`
+	Unknown1              TrimmedString `xml:"SP"`
+	ActualSupplyFanSpeed  TrimmedString `xml:"SAF"`
+	ActualExtractFanSpeed TrimmedString `xml:"EAF"`
+	TargetSupplyFanSpeed  TrimmedString `xml:"SAFS"`
+	TargetExtractFanSpeed TrimmedString `xml:"EAFS"`
+	FilterLifePercentage  TrimmedString `xml:"FCG"`
 	Ec1                   TrimmedString `xml:"EC1"`
 	Ec2                   TrimmedString `xml:"EC2"`
 	Ec3                   TrimmedString `xml:"EC3"`
@@ -91,7 +91,7 @@ func (k *KomfventRecuperator) GetStatus() (Status, error) {
 		return Status{}, err
 	}
 
-	return Status{}, nil
+	return komfventDataToStatus(data), nil
 }
 
 func (k *KomfventRecuperator) SetPower(power int) error {
@@ -141,6 +141,12 @@ func makeCharsetReader(charset string, input io.Reader) (io.Reader, error) {
 	}
 	// Zwracamy błąd, jeśli napotkamy inne, nieobsługiwane kodowanie.
 	return nil, fmt.Errorf("nieznane kodowanie: %s", charset)
+}
+
+func komfventDataToStatus(komfventData KomfventData) Status {
+	status := Status{}
+	status.ExtractAirTemperature = string(komfventData.ExtractAirTemperature)
+	return status
 }
 
 // TrimmedString to własny typ, który zachowuje się jak string,

@@ -3,11 +3,11 @@ package reku
 // Status reprezentuje aktualny stan rekuperatora.
 // Użyjemy tej struktury do przesyłania danych wewnątrz programu.
 type Status struct {
-	Power       int     `json:"moc"`
-	Recovery    int     `json:"odzysk"`
-	TempExtract float32 `json:"temp_wyciagu"`
-	TempInlet   float32 `json:"temp_nawiewu"`
-	TempOutside float32 `json:"temp_zewnatrz"`
+	Power                 int     `json:"moc"`
+	Recovery              int     `json:"odzysk"`
+	ExtractAirTemperature string  `json:"temp_wyciagu"`
+	TempInlet             float32 `json:"temp_nawiewu"`
+	TempOutside           float32 `json:"temp_zewnatrz"`
 }
 
 // RecuperatorController to nasz interfejs.
