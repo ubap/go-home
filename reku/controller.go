@@ -8,6 +8,9 @@ type Status struct {
 	ExtractAirTemperature string `json:"temp_wyciagu"`
 	SupplyAirTemperature  string `json:"temp_nawiewu"`
 	OutdoorAirTemperature string `json:"temp_zewnatrz"`
+	ActualSupplyFanSpeed  string `json:"wentylator_nawiewu"`
+	ActualExtractFanSpeed string `json:"przeplyw_wyciagu"`
+	HeatRecoveryPower     string `json:"odzysk_moc"`
 }
 
 // RecuperatorController to nasz interfejs.

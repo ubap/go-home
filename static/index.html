@@ -225,10 +225,14 @@
     <div class="status-section">
         <h2>Aktualny Status</h2>
         <div class="status-grid">
-            <span class="label">Moc:</span>
-            <span id="status-moc" class="value">--%</span>
+            <span class="label">Przepływ nawiewu:</span>
+            <span id="status-przeplyw-nawiewu" class="value">--%</span>
+
+            <span class="label">Przepływ wyciągu:</span>
+            <span id="status-przeplyw-wyciagu" class="value">--%</span>
+
             <span class="label">Odzysk ciepła:</span>
-            <span id="status-odzysk" class="value">--%</span>
+            <span id="status-odzysk" class="value">--W</span>
             <span class="label">Temp. wyciągu:</span>
             <span id="status-temp-wyciag" class="value">--.-°C</span>
             <span class="label">Temp. nawiewu:</span>
@@ -280,8 +284,9 @@
             }
             const data = await response.json();
 
-            document.getElementById('status-moc').innerText = `${data.moc}%`;
-            document.getElementById('status-odzysk').innerText = `${data.odzysk}%`;
+            document.getElementById('status-przeplyw-nawiewu').innerText = `${data.wentylator_nawiewu}`;
+            document.getElementById('status-przeplyw-wyciagu').innerText = `${data.przeplyw_wyciagu}`;
+            document.getElementById('status-odzysk').innerText = `${data.odzysk_moc}`;
             document.getElementById('status-temp-wyciag').innerText = `${data.temp_wyciagu}`;
             document.getElementById('status-temp-nawiew').innerText = `${data.temp_nawiewu}`;
             document.getElementById('status-temp-zewnatrz').innerText = `${data.temp_zewnatrz}`;

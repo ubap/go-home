@@ -38,7 +38,7 @@ type KomfventData struct {
 	TargetExtractFanSpeed TrimmedString `xml:"EAFS"`
 	FilterLifePercentage  TrimmedString `xml:"FCG"`
 	Ec1                   TrimmedString `xml:"EC1"`
-	Ec2                   TrimmedString `xml:"EC2"`
+	HeatRecoveryPower     TrimmedString `xml:"EC2"`
 	Ec3                   TrimmedString `xml:"EC3"`
 	Ec4                   TrimmedString `xml:"EC4"`
 	Ec5a                  TrimmedString `xml:"EC5A"`
@@ -59,6 +59,17 @@ type KomfventData struct {
 	Ahs                   TrimmedString `xml:"AHS"`
 	Ah                    TrimmedString `xml:"AH"`
 	Vf                    TrimmedString `xml:"VF"`
+}
+
+func komfventDataToStatus(komfventData KomfventData) Status {
+	status := Status{}
+	status.ExtractAirTemperature = string(komfventData.ExtractAirTemperature)
+	status.OutdoorAirTemperature = string(komfventData.OutdoorAirTemperature)
+	status.SupplyAirTemperature = string(komfventData.SupplyAirTemperature)
+	status.ActualSupplyFanSpeed = string(komfventData.ActualSupplyFanSpeed)
+	status.ActualExtractFanSpeed = string(komfventData.ActualExtractFanSpeed)
+	status.HeatRecoveryPower = string(komfventData.HeatRecoveryPower)
+	return status
 }
 
 func NewKomfventRecuperator() *KomfventRecuperator {
@@ -141,14 +152,6 @@ func makeCharsetReader(charset string, input io.Reader) (io.Reader, error) {
 	}
 	// Zwracamy błąd, jeśli napotkamy inne, nieobsługiwane kodowanie.
 	return nil, fmt.Errorf("nieznane kodowanie: %s", charset)
-}
-
-func komfventDataToStatus(komfventData KomfventData) Status {
-	status := Status{}
-	status.ExtractAirTemperature = string(komfventData.ExtractAirTemperature)
-	status.OutdoorAirTemperature = string(komfventData.OutdoorAirTemperature)
-	status.SupplyAirTemperature = string(komfventData.SupplyAirTemperature)
-	return status
 }
 
 // TrimmedString to własny typ, który zachowuje się jak string,
