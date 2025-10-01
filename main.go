@@ -102,7 +102,7 @@ func (s *APIServer) setPowerHandler(w http.ResponseWriter, r *http.Request) {
 	// Logowanie zmiany mocy
 	fmt.Printf("Użytkownik %s (%s) zmienia moc na %d%%\n", username, role, req.Moc)
 
-	if err := s.controller.SetPower(req.Moc); err != nil {
+	if err := s.controller.SetExtractAndSupplyFanSpeed(req.Moc, req.Moc); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

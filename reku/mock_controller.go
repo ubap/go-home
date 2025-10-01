@@ -35,10 +35,9 @@ func (m *MockRecuperator) GetStatus() (Status, error) {
 	return m.currentStatus, nil
 }
 
-// SetPower dla mocka zmienia wartość mocy w jego wewnętrznym stanie.
-func (m *MockRecuperator) SetPower(power int) error {
-	log.Printf("[MOCK] Ustawiam moc na: %d%%", power)
-	m.currentStatus.Power = power
+func (m *MockRecuperator) SetExtractAndSupplyFanSpeed(extractFanSpeed int, supplyFanSpeed int) error {
+	log.Printf("[MOCK] Ustawiam moc na: %d%%", extractFanSpeed)
+	m.currentStatus.Power = extractFanSpeed
 	return nil // Sukces
 }
 

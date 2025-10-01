@@ -19,8 +19,7 @@ type RecuperatorController interface {
 	// GetStatus pobiera aktualny stan rekuperatora.
 	GetStatus() (Status, error)
 
-	// SetPower ustawia moc wentylatorów.
-	SetPower(power int) error
+	SetExtractAndSupplyFanSpeed(extractFanSpeed int, supplyFanSpeed int) error
 
 	// SetMode ustawia tryb pracy (np. chłodzenie/grzanie).
 	// Dodajemy go dla przykładu, aby interfejs był bardziej kompletny.

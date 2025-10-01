@@ -1,10 +1,12 @@
 package reku
 
 import (
+	"bytes"
 	"encoding/xml"
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -105,9 +107,36 @@ func (k *KomfventRecuperator) GetStatus() (Status, error) {
 	return komfventDataToStatus(data), nil
 }
 
-func (k *KomfventRecuperator) SetPower(power int) error {
-	//TODO implement me
-	panic("implement me")
+func (k *KomfventRecuperator) SetExtractAndSupplyFanSpeed(extractFanSpeed int, supplyFanSpeed int) error {
+	loginError := k.login()
+	if loginError != nil {
+		return loginError
+	}
+
+	payload := fmt.Sprintf("248=%d&256=%d&", extractFanSpeed, supplyFanSpeed)
+
+	// Create a new request with the POST method
+	req, err := http.NewRequest("POST", k.address+"/ajax.xml", bytes.NewBuffer([]byte(payload)))
+	if err != nil {
+		log.Fatalf("Error creating request: %v", err)
+	}
+
+	// Set the Content-Type header
+	req.Header.Set("Content-Type", "text/plain;charset=UTF-8")
+
+	// Create an HTTP client
+	client := &http.Client{}
+
+	// Send the request
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatalf("Error sending request: %v", err)
+	}
+	defer resp.Body.Close() // Ensure the response body is closed
+	fmt.Printf("Response Status: %s\n", resp.Status)
+
+	// no error
+	return nil
 }
 
 func (k *KomfventRecuperator) SetMode(mode string) error {
