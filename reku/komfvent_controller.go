@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 
 	"golang.org/x/text/encoding/charmap"
 	"golang.org/x/text/transform"
@@ -85,6 +86,11 @@ func (k *KomfventRecuperator) GetStatus() (Status, error) {
 		return Status{}, loginError
 	}
 
+	start := time.Now()
+	defer func() {
+		log.Printf("GetStatus function execution took %s (without login)", time.Since(start))
+	}()
+
 	resp, err := http.Get(k.address + "/i.asp")
 	if err != nil {
 		fmt.Println("Error making request:", err)
@@ -113,6 +119,11 @@ func (k *KomfventRecuperator) SetExtractAndSupplyFanSpeed(extractFanSpeed int, s
 	if loginError != nil {
 		return loginError
 	}
+
+	start := time.Now()
+	defer func() {
+		log.Printf("SetExtractAndSupplyFanSpeed function execution took %s (without login)", time.Since(start))
+	}()
 
 	payload := fmt.Sprintf("248=%d&256=%d&", extractFanSpeed, supplyFanSpeed)
 
@@ -146,6 +157,11 @@ func (k *KomfventRecuperator) SetMode(mode string) error {
 }
 
 func (k *KomfventRecuperator) login() error {
+	start := time.Now()
+	defer func() {
+		log.Printf("login function execution took %s", time.Since(start))
+	}()
+
 	// Create the form data
 	formData := url.Values{}
 	formData.Set("1", k.username)
