@@ -81,48 +81,93 @@ func NewKomfventRecuperator() *KomfventRecuperator {
 }
 
 func (k *KomfventRecuperator) GetStatus() (Status, error) {
-	loginError := k.login()
-	if loginError != nil {
-		return Status{}, loginError
-	}
-
 	start := time.Now()
 	defer func() {
-		log.Printf("GetStatus function execution took %s (without login)", time.Since(start))
+		log.Printf("GetStatus function execution took %s", time.Since(start))
 	}()
 
-	resp, err := http.Get(k.address + "/i.asp")
+	data, err := k.getStatusImpl()
+
+	if errors.Is(err, ErrUnauthorized) {
+		fmt.Println("Unauthorized, trying to log in.")
+		loginError := k.login()
+		if loginError != nil {
+			return Status{}, loginError
+		}
+		return k.getStatusImpl()
+	}
 	if err != nil {
-		fmt.Println("Error making request:", err)
+		fmt.Println("Error getting status response:", err)
 		return Status{}, err
 	}
-	defer resp.Body.Close()
 
-	var data KomfventData
+	return data, nil
+}
 
-	// Tworzymy nowy dekoder, który czyta bezpośrednio z ciała odpowiedzi.
-	decoder := xml.NewDecoder(resp.Body)
-	decoder.CharsetReader = makeCharsetReader
-	// Dekodujemy XML do naszej struktury.
-	// Musimy przekazać wskaźnik do naszej zmiennej `data`.
-	err = decoder.Decode(&data)
+func (k *KomfventRecuperator) getStatusImpl() (Status, error) {
+	resp, err := http.Get(k.address + "/i.asp")
 	if err != nil {
-		fmt.Println("Error decoding XML:", err)
+		return Status{}, err
+	}
+
+	data, err := processResponse(resp)
+	if err != nil {
 		return Status{}, err
 	}
 
 	return komfventDataToStatus(data), nil
 }
 
-func (k *KomfventRecuperator) SetExtractAndSupplyFanSpeed(extractFanSpeed int, supplyFanSpeed int) error {
-	loginError := k.login()
-	if loginError != nil {
-		return loginError
+func processResponse(resp *http.Response) (KomfventData, error) {
+	var data KomfventData
+
+	// Always ensure the original response body is closed.
+	defer resp.Body.Close()
+
+	// 2. Read the raw response body (which is in windows-1250).
+	bodyBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return data, fmt.Errorf("failed to read response body: %w", err)
 	}
 
+	// 3. Create a decoder to convert from windows-1250 to UTF-8.
+	win1250Decoder := charmap.Windows1250.NewDecoder()
+
+	// 4. Transform the entire body to UTF-8 in one go.
+	// transform.Bytes is a convenient helper for this.
+	utf8Bytes, _, err := transform.Bytes(win1250Decoder, bodyBytes)
+	if err != nil {
+		return data, fmt.Errorf("failed to transform body to UTF-8: %w", err)
+	}
+
+	// 5. NOW, perform your checks on the clean UTF-8 data.
+	// We check for the UTF-8 byte representation of "Niepoprawne".
+	if bytes.Contains(utf8Bytes, []byte("Niepoprawne")) {
+		return data, ErrUnauthorized
+	}
+
+	// 6. Proceed with XML parsing using the UTF-8 data.
+	// Create a new reader from our clean utf8Bytes slice.
+	bodyReader := bytes.NewReader(bodyBytes)
+
+	decoder := xml.NewDecoder(bodyReader)
+	decoder.CharsetReader = makeCharsetReader
+
+	// Decode the XML into our structure.
+	err = decoder.Decode(&data)
+	if err != nil {
+		// The XML parsing failed. It's helpful to include the body here too.
+		return data, fmt.Errorf("failed to decode XML: %w. Body: %s", err, string(utf8Bytes))
+	}
+
+	// If we reach here, everything was successful.
+	return data, nil
+}
+
+func (k *KomfventRecuperator) SetExtractAndSupplyFanSpeed(extractFanSpeed int, supplyFanSpeed int) error {
 	start := time.Now()
 	defer func() {
-		log.Printf("SetExtractAndSupplyFanSpeed function execution took %s (without login)", time.Since(start))
+		log.Printf("SetExtractAndSupplyFanSpeed function execution took %s", time.Since(start))
 	}()
 
 	payload := fmt.Sprintf("248=%d&256=%d&", extractFanSpeed, supplyFanSpeed)
