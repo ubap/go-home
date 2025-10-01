@@ -301,6 +301,8 @@
 
 <script>
     const API_URL = '';
+    let lastStatusTimestamp = 0;
+    let lastUpdatePowerTimestamp = 0;
 
     function padZero(num) {
         return num.toString().padStart(2, '0');
@@ -311,6 +313,7 @@
 
         console.log(`Wysyłanie żądania ustawienia mocy na: ${powerValue}%`);
         startLoading(clickedButton);
+        lastUpdatePowerTimestamp = Date.now();
         try {
             const response = await fetch(`${API_URL}/api/moc`, {
                 method: 'POST',
@@ -332,16 +335,19 @@
         }
     }
 
-    async function setMode(clickedButton) {
-
-    }
-
     async function updateStatus() {
         try {
+            lastStatusTimestamp = Date.now();
             const response = await fetch(`${API_URL}/api/status`);
             if (!response.ok) {
                 const errorText = await response.text();
                 throw new Error(`Błąd serwera: ${response.status} ${errorText}`);
+            }
+            console.log("lastUpdatePowerTimestamp = " + lastUpdatePowerTimestamp)
+            console.log("lastStatusTimestamp = " + lastStatusTimestamp)
+            if (lastUpdatePowerTimestamp > lastStatusTimestamp) {
+                console.log("prevented race in status update");
+                return;
             }
             const data = await response.json();
 
