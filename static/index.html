@@ -57,7 +57,7 @@
             gap: 10px;
         }
 
-        .mode-btn, .power-btn {
+        .power-btn {
             padding: 12px;
             font-size: 16px;
             font-weight: bold;
@@ -72,12 +72,12 @@
             position: relative;
         }
 
-        .mode-btn:hover, .power-btn:hover {
+        .power-btn:hover {
             border-color: #007bff;
             color: #007bff;
         }
 
-        .mode-btn.active, .power-btn.active {
+        .power-btn.active {
             background-color: #007bff;
             color: #fff;
             border-color: #007bff;
@@ -179,14 +179,14 @@
         }
 
 
-        /* ================================================== */
+        /* ==================================================== */
         /* ===    STYLE DLA URZĄDZEŃ MOBILNYCH (TELEFON)    === */
-        /* ================================================== */
+        /* ==================================================== */
         
         @media (max-width: 480px) {
             /* html, body {
-                overflow: hidden; /* Wyłącza scrollowanie na urządzeniach mobilnych */
-            } */
+                overflow: hidden; //  Wyłącza scrollowanie na urządzeniach mobilnych
+            }  */
             
             body {
                 padding: 10px;
@@ -250,23 +250,20 @@
     <div class="control-section">
         <h2>Sterowanie</h2>
 
-        <p><strong>Tryb pracy:</strong></p>
-        <div class="button-group">
-            <button class="mode-btn active" onclick="setPower(this)">Normalny</button>
-            <button class="mode-btn" onclick="setPower(this)">Intensywny</button>
-            <button class="mode-btn" onclick="setPower(this)">Turbo</button>
-        </div>
-
         <p><strong>Wybór mocy:</strong></p>
         <div class="button-group">
             <button class="power-btn" onclick="setPower(this)">
                 <span class="btn-text">33 %</span></button>
             <button class="power-btn" onclick="setPower(this)">
-                <span class="btn-text">35 %</span></button>
+                <span class="btn-text">40 %</span></button>
+            <button class="power-btn" onclick="setPower(this)">
+                <span class="btn-text">50 %</span></button>
             <button class="power-btn" onclick="setPower(this)">
                 <span class="btn-text">60 %</span></button>
             <button class="power-btn" onclick="setPower(this)">
                 <span class="btn-text">70 %</span></button>
+            <button class="power-btn" onclick="setPower(this)">
+                <span class="btn-text">ToDo</span></button>
         </div>
 
         <p><strong>Temp nawiewu:</strong></p>
