@@ -65,6 +65,7 @@ type KomfventData struct {
 
 func komfventDataToStatus(komfventData KomfventData) Status {
 	status := Status{}
+	status.Mode = string(komfventData.Mode)
 	status.ExtractAirTemperature = string(komfventData.ExtractAirTemperature)
 	status.OutdoorAirTemperature = string(komfventData.OutdoorAirTemperature)
 	status.SupplyAirTemperature = string(komfventData.SupplyAirTemperature)

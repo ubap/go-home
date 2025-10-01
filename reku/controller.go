@@ -3,7 +3,7 @@ package reku
 // Status reprezentuje aktualny stan rekuperatora.
 // Użyjemy tej struktury do przesyłania danych wewnątrz programu.
 type Status struct {
-	Power                 int    `json:"moc"`
+	Mode                  string `json:"tryb_pracy"`
 	Recovery              int    `json:"odzysk"`
 	ExtractAirTemperature string `json:"temp_wyciagu"`
 	SupplyAirTemperature  string `json:"temp_nawiewu"`

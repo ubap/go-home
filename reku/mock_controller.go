@@ -19,7 +19,6 @@ func NewMockRecuperator() *MockRecuperator {
 	log.Println("Używam mockowego kontrolera rekuperatora.")
 	return &MockRecuperator{
 		currentStatus: Status{
-			Power:                 45,
 			Recovery:              88,
 			ExtractAirTemperature: "21.5 °C",
 			SupplyAirTemperature:  "19.8 °C",
@@ -37,7 +36,6 @@ func (m *MockRecuperator) GetStatus() (Status, error) {
 
 func (m *MockRecuperator) SetExtractAndSupplyFanSpeed(extractFanSpeed int, supplyFanSpeed int) error {
 	log.Printf("[MOCK] Ustawiam moc na: %d%%", extractFanSpeed)
-	m.currentStatus.Power = extractFanSpeed
 	return nil // Sukces
 }
 

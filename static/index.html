@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel Rekuperatora</title>
     <style>
-        /* ================================================== */
+        /* ====================================================== */
         /* === STYLE OGÓLNE (DLA KOMPUTERÓW I DUŻYCH EKRANÓW) === */
-        /* ================================================== */
+        /* ====================================================== */
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -53,11 +53,11 @@
 
         .button-group {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr;
             gap: 10px;
         }
 
-        .power-btn {
+        .mode-btn, .power-btn {
             padding: 12px;
             font-size: 16px;
             font-weight: bold;
@@ -67,17 +67,63 @@
             border-radius: 5px;
             cursor: pointer;
             transition: all 0.2s ease-in-out;
+
+            /* THIS IS THE CRITICAL LINE THAT KEEPS THE SPINNER INSIDE */
+            position: relative;
         }
 
-        .power-btn:hover {
+        .mode-btn:hover, .power-btn:hover {
             border-color: #007bff;
             color: #007bff;
         }
 
-        .power-btn.active {
+        .mode-btn.active, .power-btn.active {
             background-color: #007bff;
             color: #fff;
             border-color: #007bff;
+        }
+
+        /* 2. Style for the button when it's in the loading state */
+        .power-btn.loading {
+            border-color: #007bff;
+            /* Prevent clicking the button again while loading */
+            pointer-events: none;
+            /* Slightly dim the button to indicate it's busy */
+            opacity: 0.8;
+        }
+
+        /* 3. Make the button's original text invisible */
+        .power-btn.loading > .btn-text {
+            visibility: hidden;
+        }
+
+        /* 4. Create the spinner using a pseudo-element */
+        .power-btn.loading::after {
+            content: "";
+            display: block;
+            position: absolute;
+
+            /* Center the spinner */
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+
+            /* Spinner styles */
+            width: 20px;
+            height: 20px;
+            border: 3px solid #ccc;
+            border-top-color: #007bff;
+            border-radius: 50%;
+
+            /* Animation definition */
+            animation: spin 1s linear infinite;
+        }
+
+        /* 5. Define the rotation animation */
+        @keyframes spin {
+            to {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
         }
 
         .mode-selection label {
@@ -204,15 +250,24 @@
     <div class="control-section">
         <h2>Sterowanie</h2>
 
-        <p><strong>Wybór mocy:</strong></p>
+        <p><strong>Tryb pracy:</strong></p>
         <div class="button-group">
-            <button class="power-btn" onclick="setPower(this)">33%</button>
-            <button class="power-btn" onclick="setPower(this)">45%</button>
-            <button class="power-btn" onclick="setPower(this)">50%</button>
-            <button class="power-btn" onclick="setPower(this)">70%</button>
+            <button class="mode-btn active" onclick="setPower(this)">Normalny</button>
+            <button class="mode-btn" onclick="setPower(this)">Intensywny</button>
+            <button class="mode-btn" onclick="setPower(this)">Turbo</button>
         </div>
 
-        <br>
+        <p><strong>Wybór mocy:</strong></p>
+        <div class="button-group">
+            <button class="power-btn" onclick="setPower(this)">
+                <span class="btn-text">33 %</span></button>
+            <button class="power-btn" onclick="setPower(this)">
+                <span class="btn-text">35 %</span></button>
+            <button class="power-btn" onclick="setPower(this)">
+                <span class="btn-text">60 %</span></button>
+            <button class="power-btn" onclick="setPower(this)">
+                <span class="btn-text">70 %</span></button>
+        </div>
 
         <p><strong>Temp nawiewu:</strong></p>
         <div class="button-group">
@@ -256,7 +311,9 @@
 
     async function setPower(clickedButton) {
         const powerValue = parseInt(clickedButton.innerText.replace('%', ''));
+
         console.log(`Wysyłanie żądania ustawienia mocy na: ${powerValue}%`);
+        startLoading(clickedButton);
         try {
             const response = await fetch(`${API_URL}/api/moc`, {
                 method: 'POST',
@@ -268,11 +325,18 @@
                 throw new Error(`Błąd serwera: ${response.status} ${errorText}`);
             }
             console.log('Moc została pomyślnie ustawiona.');
-            updateActiveButton(powerValue);
+
+            stopLoading(clickedButton);
+            updateActivePowerButton(powerValue.toString() + ' %');
         } catch (error) {
+            stopLoading(clickedButton);
             console.error('Nie udało się ustawić mocy:', error);
-            alert('Wystąpił błąd podczas komunikacji z serwerem.');
+            alert('Nie udało się ustawić mocy.');
         }
+    }
+
+    async function setMode(clickedButton) {
+
     }
 
     async function updateStatus() {
@@ -291,7 +355,7 @@
             document.getElementById('status-temp-nawiew').innerText = `${data.temp_nawiewu}`;
             document.getElementById('status-temp-zewnatrz').innerText = `${data.temp_zewnatrz}`;
             
-            updateActiveButton(data.moc);
+            updateActivePowerButton(data.wentylator_nawiewu);
 
             const now = new Date();
             const hours = padZero(now.getHours());
@@ -306,16 +370,42 @@
         }
     }
 
-    function updateActiveButton(activePower) {
-        const buttons = document.querySelectorAll('.power-btn');
-        buttons.forEach(btn => {
-            const btnPower = parseInt(btn.innerText.replace('%', ''));
-            if (btnPower === activePower) {
+    function updateActiveModeButton(mode, powerValue) {
+
+        const modeButtons = document.querySelectorAll('.mode-btn');
+        modeButtons.forEach(btn => {
+            const btnPower = parseInt(btn.innerText);
+            if (btnPower.localeCompare(status.tryb_pracy)) {
                 btn.classList.add('active');
             } else {
                 btn.classList.remove('active');
             }
         });
+    }
+
+    function updateActivePowerButton(activePower) {
+        const powerButtons = document.querySelectorAll('.power-btn');
+        powerButtons.forEach(btn => {
+            if (btn.innerText === activePower) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+    }
+
+    function startLoading(button) {
+        // Add the .loading class to show the spinner
+        button.classList.add('loading');
+        // Disable the button to prevent multiple clicks
+        button.disabled = true;
+    }
+
+    function stopLoading(button) {
+        // Remove the .loading class to hide the spinner
+        button.classList.remove('loading');
+        // Re-enable the button
+        button.disabled = false;
     }
 
     document.addEventListener('DOMContentLoaded', () => {
