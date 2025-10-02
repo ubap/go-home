@@ -263,7 +263,7 @@
             <button class="power-btn" onclick="setPower(this)">
                 <span class="btn-text">70 %</span></button>
             <button class="power-btn" onclick="setPower(this)">
-                <span class="btn-text">ToDo</span></button>
+                <span class="btn-text">80 %</span></button>
         </div>
 
         <p><strong>Temp nawiewu:</strong></p>
@@ -325,9 +325,9 @@
                 throw new Error(`Błąd serwera: ${response.status} ${errorText}`);
             }
             console.log('Moc została pomyślnie ustawiona.');
-
             stopLoading(clickedButton);
             updateActivePowerButton(powerValue.toString() + ' %');
+            setTimeout(updateStatus, 1000);
         } catch (error) {
             stopLoading(clickedButton);
             console.error('Nie udało się ustawić mocy:', error);
@@ -371,19 +371,6 @@
         } catch (error) {
             console.error('Nie udało się pobrać statusu:', error);
         }
-    }
-
-    function updateActiveModeButton(mode, powerValue) {
-
-        const modeButtons = document.querySelectorAll('.mode-btn');
-        modeButtons.forEach(btn => {
-            const btnPower = parseInt(btn.innerText);
-            if (btnPower.localeCompare(status.tryb_pracy)) {
-                btn.classList.add('active');
-            } else {
-                btn.classList.remove('active');
-            }
-        });
     }
 
     function updateActivePowerButton(activePower) {
