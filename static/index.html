@@ -327,7 +327,6 @@
             console.log('Moc została pomyślnie ustawiona.');
             stopLoading(clickedButton);
             updateActivePowerButton(powerValue.toString() + ' %');
-            setTimeout(updateStatus, 1000);
         } catch (error) {
             stopLoading(clickedButton);
             console.error('Nie udało się ustawić mocy:', error);
