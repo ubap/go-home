@@ -154,29 +154,25 @@ func (k *KomfventRecuperator) SetExtractAndSupplyFanSpeed(extractFanSpeed int, s
 		log.Printf("SetExtractAndSupplyFanSpeed function execution took %s", time.Since(start))
 	}()
 
+	// These are the magic values for mode "NORMALNY"
 	payload := fmt.Sprintf("248=%d&256=%d&", extractFanSpeed, supplyFanSpeed)
 
-	// Create a new request with the POST method
 	req, err := http.NewRequest("POST", k.address+"/ajax.xml", bytes.NewBuffer([]byte(payload)))
 	if err != nil {
 		log.Fatalf("Error creating request: %v", err)
 	}
 
-	// Set the Content-Type header
 	req.Header.Set("Content-Type", "text/plain;charset=UTF-8")
 
-	// Create an HTTP client
 	client := &http.Client{}
 
-	// Send the request
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Fatalf("Error sending request: %v", err)
 	}
-	defer resp.Body.Close() // Ensure the response body is closed
+	defer resp.Body.Close()
 	log.Printf("Response Status: %s\n", resp.Status)
 
-	// no error
 	return nil
 }
 
@@ -213,32 +209,19 @@ func (k *KomfventRecuperator) login() error {
 
 func makeCharsetReader(charset string, input io.Reader) (io.Reader, error) {
 	if charset == "windows-1250" {
-		// Zwracamy specjalny reader, który w locie konwertuje
-		// windows-1250 na UTF-8.
 		return transform.NewReader(input, charmap.Windows1250.NewDecoder()), nil
 	}
-	// Zwracamy błąd, jeśli napotkamy inne, nieobsługiwane kodowanie.
 	return nil, fmt.Errorf("nieznane kodowanie: %s", charset)
 }
 
-// TrimmedString to własny typ, który zachowuje się jak string,
-// ale automatycznie usuwa białe znaki z początku i końca
-// podczas dekodowania z XML.
 type TrimmedString string
 
-// UnmarshalXML implementuje interfejs xml.Unmarshaler dla naszego typu.
-// Ta metoda zostanie automatycznie wywołana przez dekoder XML
-// dla każdego pola, które jest typu TrimmedString.
 func (ts *TrimmedString) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	var s string
-	// DecodeElement odczytuje zawartość tekstową elementu do zwykłego stringa.
 	if err := d.DecodeElement(&s, &start); err != nil {
 		return err
 	}
 
-	// Kluczowy moment: usuwamy białe znaki i przypisujemy wynik
-	// do naszej wartości TrimmedString.
 	*ts = TrimmedString(strings.TrimSpace(s))
-
 	return nil
 }
