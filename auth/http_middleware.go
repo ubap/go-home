@@ -3,6 +3,7 @@ package auth
 import (
 	"encoding/base64"
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 )
@@ -13,6 +14,7 @@ func (ba *UserManager) BasicAuthMiddleware() func(http.Handler) http.Handler {
 			// Get the Authorization header
 			auth := r.Header.Get("Authorization")
 			if auth == "" {
+				ba.logFailedAttempt(r, "", "no auth header")
 				ba.requestAuth(w)
 				return
 			}
@@ -20,6 +22,7 @@ func (ba *UserManager) BasicAuthMiddleware() func(http.Handler) http.Handler {
 			// Parse Basic Auth
 			username, password, ok := ba.parseBasicAuth(auth)
 			if !ok {
+				ba.logFailedAttempt(r, username, "malformed_auth_header")
 				ba.requestAuth(w)
 				return
 			}
@@ -27,6 +30,7 @@ func (ba *UserManager) BasicAuthMiddleware() func(http.Handler) http.Handler {
 			// Validate credentials
 			user, valid := ba.ValidateCredentials(username, password)
 			if !valid {
+				ba.logFailedAttempt(r, username, "invalid_credentials")
 				ba.requestAuth(w)
 				return
 			}
@@ -66,4 +70,34 @@ func (ba *UserManager) parseBasicAuth(auth string) (username, password string, o
 func (ba *UserManager) requestAuth(w http.ResponseWriter) {
 	w.Header().Set("WWW-Authenticate", fmt.Sprintf(`Basic realm="%s"`, ba.realm))
 	http.Error(w, "Authentication required", http.StatusUnauthorized)
+}
+
+func (ba *UserManager) logFailedAttempt(r *http.Request, username string, reason string) {
+	ip := getVisitorIP(r)
+
+	log.Printf(
+		`[AUTH_FAILURE] reason="%s" username="%s" remote_ip="%s" user_agent="%s"`,
+		reason,
+		username,
+		ip,
+		r.UserAgent(),
+	)
+}
+
+func getVisitorIP(r *http.Request) string {
+	if cfIP := r.Header.Get("CF-Connecting-IP"); cfIP != "" {
+		return cfIP
+	}
+
+	if forwardedFor := r.Header.Get("X-Forwarded-For"); forwardedFor != "" {
+		// The header can be a comma-separated list, e.g., "client, proxy1, proxy2"
+		ips := strings.Split(forwardedFor, ",")
+		return strings.TrimSpace(ips[0])
+	}
+
+	if realIP := r.Header.Get("X-Real-IP"); realIP != "" {
+		return realIP
+	}
+
+	return r.RemoteAddr
 }
