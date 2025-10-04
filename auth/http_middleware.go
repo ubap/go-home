@@ -35,6 +35,13 @@ func (ba *UserManager) BasicAuthMiddleware() func(http.Handler) http.Handler {
 				return
 			}
 
+			log.Printf(
+				`[AUTH_SUCCESS] username="%s" remote_ip="%s" user_agent="%s"`,
+				username,
+				getVisitorIP(r),
+				r.UserAgent(),
+			)
+
 			// Add user info to headers for use in handlers
 			r.Header.Set("X-Auth-User", user.Username)
 
