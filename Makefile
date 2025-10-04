@@ -3,14 +3,10 @@ BINARY_NAME=myapp
 # The directory to place the final binary into
 BUILD_DIR=target
 
-
-# --- Targets ---
-
 # The 'all' target is the default one executed when you just run 'make'
 .PHONY: all
 all: build
 
-# Builds the Go application
 .PHONY: build
 build:
 	@echo "==> Building..."
@@ -18,27 +14,28 @@ build:
 	go build -o $(BUILD_DIR)/$(BINARY_NAME) .
 	@echo "==> Done! Binary is at $(BUILD_DIR)/$(BINARY_NAME)"
 
-# Cleans the build artifacts
 .PHONY: clean
 clean:
 	@echo "==> Cleaning..."
 	@rm -rf $(BUILD_DIR)
 	@echo "==> Done!"
 
-# Runs the application
 .PHONY: run
 run: build
 	@echo "==> Running..."
 	./$(BUILD_DIR)/$(BINARY_NAME)
 
-# Runs the tests
 .PHONY: test
 test:
 	@echo "==> Testing..."
 	go test ./... -v
 
-# Installs the binary to the Go bin path
 .PHONY: deploy
 deploy:
 	@echo "==> Deploying..."
 	./cmd/deploy.sh
+
+.PHONY: logs
+logs:
+	@echo "==> Downloading logs..."
+	./cmd/logs.sh > logs.txt

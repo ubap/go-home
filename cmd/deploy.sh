@@ -14,7 +14,7 @@ REMOTE_PATH="/home/admin/go-home/"
 SERVICE_NAME="gohome.service"
 
 # Set the name of the binary to be built.
-BINARY_NAME="goHome-rpi"
+BINARY_NAME="target/goHome-rpi"
 
 DATA_DIR="data"
 
