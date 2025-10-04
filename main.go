@@ -19,7 +19,7 @@ const dbFile = "data/users.json"
 
 func main() {
 	useMock := flag.Bool("mock", false, "Użyj mockowego kontrolera zamiast prawdziwego")
-	flag.Parse() // Parsujemy flagi podane przy uruchomieniu
+	flag.Parse()
 
 	var ctrl reku.RecuperatorController
 

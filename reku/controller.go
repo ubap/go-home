@@ -1,7 +1,6 @@
 package reku
 
-// Status reprezentuje aktualny stan rekuperatora.
-// Użyjemy tej struktury do przesyłania danych wewnątrz programu.
+// Status structure is used for serializing data to send to the fronend.
 type Status struct {
 	Mode                  string `json:"tryb_pracy"`
 	Recovery              int    `json:"odzysk"`
@@ -13,15 +12,8 @@ type Status struct {
 	HeatRecoveryPower     string `json:"odzysk_moc"`
 }
 
-// RecuperatorController to nasz interfejs.
-// Definiuje on zestaw metod, które każda implementacja (prawdziwa, mockowa) musi posiadać.
 type RecuperatorController interface {
-	// GetStatus pobiera aktualny stan rekuperatora.
 	GetStatus() (Status, error)
 
 	SetExtractAndSupplyFanSpeed(extractFanSpeed int, supplyFanSpeed int) error
-
-	// SetMode ustawia tryb pracy (np. chłodzenie/grzanie).
-	// Dodajemy go dla przykładu, aby interfejs był bardziej kompletny.
-	SetMode(mode string) error
 }

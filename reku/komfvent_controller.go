@@ -22,14 +22,11 @@ type KomfventRecuperator struct {
 	password string
 }
 
-// KomfventData odzwierciedla strukturę odpowiedzi XML.
-// Nazwa struktury może być dowolna, ale dobrze, by była opisowa.
+// KomfventData is the struct to deserialize status XML response into.
 type KomfventData struct {
-	// To specjalne pole mówi parserowi, że oczekujemy,
-	// że główny element XML będzie miał nazwę "A".
+	// Root element is named A
 	XMLName xml.Name `xml:"A"`
 
-	// Tag `xml:"OMO"` mapuje element <OMO> na pole Mode w strukturze.
 	Mode                  TrimmedString `xml:"OMO"`
 	SupplyAirTemperature  TrimmedString `xml:"AI0"`
 	ExtractAirTemperature TrimmedString `xml:"AI1"`
@@ -87,9 +84,8 @@ func (k *KomfventRecuperator) GetStatus() (Status, error) {
 	}()
 
 	data, err := k.getStatusImpl()
-
 	if errors.Is(err, ErrUnauthorized) {
-		fmt.Println("Unauthorized, trying to log in.")
+		log.Printf("Unauthorized, trying to log in.")
 		loginError := k.login()
 		if loginError != nil {
 			return Status{}, loginError
@@ -97,7 +93,7 @@ func (k *KomfventRecuperator) GetStatus() (Status, error) {
 		return k.getStatusImpl()
 	}
 	if err != nil {
-		fmt.Println("Error getting status response:", err)
+		log.Printf("Error getting status response: %s", err)
 		return Status{}, err
 	}
 
@@ -109,6 +105,7 @@ func (k *KomfventRecuperator) getStatusImpl() (Status, error) {
 	if err != nil {
 		return Status{}, err
 	}
+	defer resp.Body.Close()
 
 	data, err := processResponse(resp)
 	if err != nil {
@@ -121,46 +118,33 @@ func (k *KomfventRecuperator) getStatusImpl() (Status, error) {
 func processResponse(resp *http.Response) (KomfventData, error) {
 	var data KomfventData
 
-	// Always ensure the original response body is closed.
-	defer resp.Body.Close()
-
-	// 2. Read the raw response body (which is in windows-1250).
 	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return data, fmt.Errorf("failed to read response body: %w", err)
 	}
 
-	// 3. Create a decoder to convert from windows-1250 to UTF-8.
 	win1250Decoder := charmap.Windows1250.NewDecoder()
 
-	// 4. Transform the entire body to UTF-8 in one go.
-	// transform.Bytes is a convenient helper for this.
 	utf8Bytes, _, err := transform.Bytes(win1250Decoder, bodyBytes)
 	if err != nil {
 		return data, fmt.Errorf("failed to transform body to UTF-8: %w", err)
 	}
 
-	// 5. NOW, perform your checks on the clean UTF-8 data.
-	// We check for the UTF-8 byte representation of "Niepoprawne".
+	// Check for Unauthorized screen. Unfortunately the device returns 200 with some HTML in the body.
 	if bytes.Contains(utf8Bytes, []byte("Niepoprawne")) {
 		return data, ErrUnauthorized
 	}
 
-	// 6. Proceed with XML parsing using the UTF-8 data.
-	// Create a new reader from our clean utf8Bytes slice.
 	bodyReader := bytes.NewReader(bodyBytes)
-
 	decoder := xml.NewDecoder(bodyReader)
 	decoder.CharsetReader = makeCharsetReader
 
-	// Decode the XML into our structure.
 	err = decoder.Decode(&data)
 	if err != nil {
 		// The XML parsing failed. It's helpful to include the body here too.
 		return data, fmt.Errorf("failed to decode XML: %w. Body: %s", err, string(utf8Bytes))
 	}
 
-	// If we reach here, everything was successful.
 	return data, nil
 }
 
@@ -190,15 +174,10 @@ func (k *KomfventRecuperator) SetExtractAndSupplyFanSpeed(extractFanSpeed int, s
 		log.Fatalf("Error sending request: %v", err)
 	}
 	defer resp.Body.Close() // Ensure the response body is closed
-	fmt.Printf("Response Status: %s\n", resp.Status)
+	log.Printf("Response Status: %s\n", resp.Status)
 
 	// no error
 	return nil
-}
-
-func (k *KomfventRecuperator) SetMode(mode string) error {
-	//TODO implement me
-	panic("implement me")
 }
 
 func (k *KomfventRecuperator) login() error {
@@ -207,24 +186,21 @@ func (k *KomfventRecuperator) login() error {
 		log.Printf("login function execution took %s", time.Since(start))
 	}()
 
-	// Create the form data
 	formData := url.Values{}
 	formData.Set("1", k.username)
 	formData.Set("2", k.password)
 
-	// Make the POST request
 	// http.PostForm automatically sets Content-Type to application/x-www-form-urlencoded
 	resp, err := http.PostForm(k.address, formData)
 	if err != nil {
-		fmt.Println("Error making request:", err)
+		log.Printf("Error making request: %s", err)
 		return err
 	}
 	defer resp.Body.Close()
 
-	// Read the response body
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Println("Error reading response:", err)
+		log.Printf("Error reading response: %s", err)
 		return err
 	}
 
