@@ -68,7 +68,6 @@ func (s *APIServer) setPowerHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	username := r.Header.Get("X-Auth-User")
-	role := r.Header.Get("X-Auth-Role")
 
 	var req struct {
 		Moc int `json:"moc"`
@@ -79,7 +78,7 @@ func (s *APIServer) setPowerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Printf("Użytkownik %s (%s) zmienia moc na %d%%\n", username, role, req.Moc)
+	fmt.Printf("Użytkownik %s zmienia moc na %d%%\n", username, req.Moc)
 
 	if err := s.controller.SetExtractAndSupplyFanSpeed(req.Moc, req.Moc); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
