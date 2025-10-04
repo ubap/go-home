@@ -14,8 +14,8 @@ import (
 const dbFile = "data/users.json"
 
 func main() {
-	if len(os.Args) < 3 {
-		fmt.Println("Usage: go run cmd/user-manager/main.go <add> <username>")
+	if len(os.Args) < 2 {
+		fmt.Println("Usage: go run cmd/user-manager/main.go <add>")
 		os.Exit(1)
 	}
 
@@ -27,19 +27,24 @@ func main() {
 	command := os.Args[1]
 	switch command {
 	case "add":
-		if len(os.Args) < 3 {
-			fmt.Println("Usage: go run cmd/user-manager/main.go add <username>")
+		if len(os.Args) < 2 {
+			fmt.Println("Usage: go run cmd/user-manager/main.go add")
 			os.Exit(1)
 		}
-		username := os.Args[2]
-		addUser(authManager, username)
+		addUser(authManager)
 	default:
 		fmt.Printf("Unknown command: %s\n", command)
 		os.Exit(1)
 	}
 }
 
-func addUser(authManager *auth.UserManager, username string) {
+func addUser(authManager *auth.UserManager) {
+	fmt.Print("Enter Username: ")
+	var username string
+	_, err := fmt.Scanln(&username)
+	if err != nil {
+		log.Fatalf("Error reading username: %v", err)
+	}
 	fmt.Print("Enter Password: ")
 	// Read password securely without echoing to the terminal
 	bytePassword, err := term.ReadPassword(syscall.Stdin)

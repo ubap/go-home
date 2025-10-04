@@ -7,6 +7,12 @@ make build
 make test
 ```
 
+To add user
+
+```bash
+make user
+```
+
 ```bash
 make deploy
 ```

@@ -39,3 +39,8 @@ deploy:
 logs:
 	@echo "==> Downloading logs..."
 	./cmd/logs.sh > logs.txt
+
+.PHONY: user
+user:
+	@echo "==> Adding user..."
+	go run cmd/user-manager/main.go add
