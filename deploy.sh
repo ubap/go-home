@@ -16,6 +16,8 @@ SERVICE_NAME="gohome.service"
 # Set the name of the binary to be built.
 BINARY_NAME="goHome-rpi"
 
+DATA_DIR="data"
+
 # --- Script Logic ---
 
 # Exit immediately if any command fails
@@ -36,7 +38,12 @@ scp ./${BINARY_NAME} ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_PATH}
 echo "Binary copied successfully."
 
 echo ""
-echo "--- 4. Starting the remote service and checking its status..."
+echo "--- 4. Copying data to the Raspberry Pi..."
+scp -pr ./${DATA_DIR} ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_PATH}
+echo "Binary copied successfully."
+
+echo ""
+echo "--- 5. Starting the remote service and checking its status..."
 ssh ${REMOTE_USER}@${REMOTE_HOST} "sudo systemctl start ${SERVICE_NAME} && echo '--- Service Status: ---' && sudo systemctl status ${SERVICE_NAME}"
 
 echo ""
