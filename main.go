@@ -51,16 +51,9 @@ func main() {
 	// Admin endpoint - tylko dla administratorów
 	http.HandleFunc("/api/admin/users", server.auth.BasicAuthMiddleware("admin")(http.HandlerFunc(server.adminHandler)).ServeHTTP)
 
-	fmt.Println("=== SYSTEM AUTORYZACJI AKTYWNY ===")
-	fmt.Println("Serwer uruchomiony na porcie 8080")
-	fmt.Println("Dostęp wymaga autoryzacji Basic Auth")
-	fmt.Println("Użytkownicy:")
-	fmt.Println("  admin:admin123! (pełny dostęp)")
-	fmt.Println("  family:family123! (dostęp użytkownika)")
-	fmt.Println("WAŻNE: Zmień hasła natychmiast!")
-	fmt.Println("=====================================")
-
-	if err := http.ListenAndServe(":8080", nil); err != nil {
+	addr := ":8080"
+	log.Printf("Server starting on http://localhost%s", addr)
+	if err := http.ListenAndServe(addr, nil); err != nil {
 		log.Fatal(err)
 	}
 }
