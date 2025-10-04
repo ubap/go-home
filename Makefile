@@ -1,4 +1,4 @@
-BINARY_NAME=myapp
+BINARY_NAME=goHome
 
 # The directory to place the final binary into
 BUILD_DIR=target
