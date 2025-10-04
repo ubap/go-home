@@ -1,10 +1,3 @@
-# ====================================================================================
-#  Makefile for the Go Project
-# ====================================================================================
-
-# --- Variables ---
-
-# The name of the final binary
 BINARY_NAME=myapp
 
 # The directory to place the final binary into
@@ -45,7 +38,7 @@ test:
 	go test ./... -v
 
 # Installs the binary to the Go bin path
-.PHONY: install
-install:
-	@echo "==> Installing..."
-	go install .
+.PHONY: deploy
+deploy:
+	@echo "==> Deploying..."
+	./cmd/deploy.sh
