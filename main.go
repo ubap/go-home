@@ -15,7 +15,7 @@ type APIServer struct {
 	auth       *auth2.UserManager
 }
 
-const dbFile = "/data/users.json"
+const dbFile = "data/users.json"
 
 func main() {
 	useMock := flag.Bool("mock", false, "Użyj mockowego kontrolera zamiast prawdziwego")
